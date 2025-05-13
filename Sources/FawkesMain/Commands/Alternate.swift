@@ -19,10 +19,24 @@ struct Alternate: ParsableCommand {
             // Convert AlternatePathType to Target
             let targetOptions = validTargets.map { Target(rawValue: $0.rawValue)! }
             
+            // Check which files exist for display purposes
+            var fileExistsMap: [AlternatePathType: Bool] = [:]
+            for target in validTargets {
+                do {
+                    let result = try converter.convertPath(inputPath: path, altType: target)
+                    fileExistsMap[target] = FileManager.default.fileExists(atPath: result.path)
+                } catch {
+                    fileExistsMap[target] = false
+                }
+            }
+            
             // Print the numbered list of targets
             print("Available targets for \(path):")
             for (index, targetOption) in targetOptions.enumerated() {
-                print("\(index + 1). \(targetOption.rawValue)")
+                let targetType = AlternatePathType(rawValue: targetOption.rawValue)!
+                let fileExists = fileExistsMap[targetType] ?? false
+                let createIndicator = (!fileExists) ? " (create new)" : ""
+                print("\(index + 1). \(targetOption.rawValue)\(createIndicator)")
             }
         
             // Prompt and get user input
