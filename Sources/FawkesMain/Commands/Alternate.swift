@@ -11,7 +11,7 @@ struct Alternate: ParsableCommand {
     enum Target: String, ExpressibleByArgument, CaseIterable {
         case test, controller, model, view, html, live, component, liveComponent, channel, json, task, feature
     
-        // Displays a list of available targets and handles user selection
+        // Displays a list of available targets and handles user selection with interactive menu
         static func selectTargetInteractively(forPath path: String, checkFileExists: Bool) throws -> AlternatePathType {
             let converter = AlternatePathConverter()
             let validTargets = converter.getValidTargets(forPath: path, checkFileExists: checkFileExists)
@@ -30,33 +30,30 @@ struct Alternate: ParsableCommand {
                 }
             }
             
-            // Print the numbered list of targets
-            print("Available targets for \(path):")
-            for (index, targetOption) in targetOptions.enumerated() {
+            // Prepare menu items with indicators for file existence
+            var menuItems: [String] = []
+            for targetOption in targetOptions {
                 let targetType = AlternatePathType(rawValue: targetOption.rawValue)!
                 let fileExists = fileExistsMap[targetType] ?? false
                 let createIndicator = (!fileExists) ? " (create new)" : ""
-                print("\(index + 1). \(targetOption.rawValue)\(createIndicator)")
+                menuItems.append("\(targetOption.rawValue)\(createIndicator)")
             }
-        
-            // Prompt and get user input
-            print("\nEnter target number (1-\(targetOptions.count)): ", terminator: "")
-            guard let input = readLine(), !input.isEmpty else {
-                print("No selection made, defaulting to test")
+            
+            // Create and show the interactive terminal menu
+            let menu = TerminalMenu(items: menuItems, prompt: "Available targets for \(path):")
+            let result = menu.show()
+            
+            // Handle the menu result
+            switch result {
+            case .selected(let index):
+                let selectedTarget = targetOptions[index]
+                print("Selected target: \(selectedTarget.rawValue)")
+                return AlternatePathType(rawValue: selectedTarget.rawValue)!
+                
+            case .cancelled:
+                print("Selection cancelled, defaulting to test")
                 return .test
             }
-        
-            // Parse the user input
-            guard let selection = Int(input.trimmingCharacters(in: .whitespacesAndNewlines)),
-                  selection >= 1 && selection <= targetOptions.count else {
-                print("Invalid selection, defaulting to test")
-                return .test
-            }
-        
-            // Convert the selection to a target type
-            let selectedTarget = targetOptions[selection - 1]
-            print("Selected target: \(selectedTarget.rawValue)")
-            return AlternatePathType(rawValue: selectedTarget.rawValue)!
         }
     }
 
