@@ -8,12 +8,46 @@ struct Alternate: ParsableCommand {
         aliases: ["alt"]
     )
 
-    enum Target: String, ExpressibleByArgument {
+    enum Target: String, ExpressibleByArgument, CaseIterable {
         case test, controller, model, view, html, live, component, liveComponent, channel, json, task, feature
+    
+        // Displays a list of available targets and handles user selection
+        static func selectTargetInteractively(forPath path: String, checkFileExists: Bool) throws -> AlternatePathType {
+            let converter = AlternatePathConverter()
+            let validTargets = converter.getValidTargets(forPath: path, checkFileExists: checkFileExists)
+            
+            // Convert AlternatePathType to Target
+            let targetOptions = validTargets.map { Target(rawValue: $0.rawValue)! }
+            
+            // Print the numbered list of targets
+            print("Available targets for \(path):")
+            for (index, targetOption) in targetOptions.enumerated() {
+                print("\(index + 1). \(targetOption.rawValue)")
+            }
+        
+            // Prompt and get user input
+            print("\nEnter target number (1-\(targetOptions.count)): ", terminator: "")
+            guard let input = readLine(), !input.isEmpty else {
+                print("No selection made, defaulting to test")
+                return .test
+            }
+        
+            // Parse the user input
+            guard let selection = Int(input.trimmingCharacters(in: .whitespacesAndNewlines)),
+                  selection >= 1 && selection <= targetOptions.count else {
+                print("Invalid selection, defaulting to test")
+                return .test
+            }
+        
+            // Convert the selection to a target type
+            let selectedTarget = targetOptions[selection - 1]
+            print("Selected target: \(selectedTarget.rawValue)")
+            return AlternatePathType(rawValue: selectedTarget.rawValue)!
+        }
     }
 
-    @Option(help: "Type of target to visit")
-    var target: Target = .test
+    @Option(help: "Type of target to visit. If not specified, a list of targets will be shown for selection.")
+    var target: Target?
     
     @Argument(help: "The input file path to convert")
     var inputPath: String
@@ -38,7 +72,15 @@ struct Alternate: ParsableCommand {
     
     func run() throws {
         let converter = AlternatePathConverter()
-        let pathType = AlternatePathType(rawValue: target.rawValue)!
+        
+        // If no target is specified, display a list and prompt for selection
+        let pathType: AlternatePathType
+        if let selectedTarget = target {
+            pathType = AlternatePathType(rawValue: selectedTarget.rawValue)!
+        } else {
+            // Only check file existence when --create is false
+            pathType = try Target.selectTargetInteractively(forPath: inputPath, checkFileExists: !create)
+        }
         
         do {
             let result = try converter.convertPath(inputPath: inputPath, altType: pathType)

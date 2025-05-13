@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AlternatePathType: String, Sendable {
+public enum AlternatePathType: String, Sendable, CaseIterable {
     case test, controller, model, view, html, live, component, liveComponent, channel, json, task, feature
 }
 
@@ -33,6 +33,73 @@ public struct ConversionResult: Sendable {
 public struct AlternatePathConverter: Sendable {
     
     public init() {}
+    
+    // Get valid target types for a given input path
+    // When checkFileExists is true, it only returns targets for which the files already exist
+    public func getValidTargets(forPath inputPath: String, checkFileExists: Bool = false) -> [AlternatePathType] {
+        // Normalize the path
+        let normalizedPath = inputPath.hasPrefix("./") ? String(inputPath.dropFirst(2)) : inputPath
+        let pathComponents = normalizedPath.components(separatedBy: "/")
+        
+        // Check if there's a file at the end
+        guard !pathComponents.isEmpty, let filename = pathComponents.last, filename.contains(".") else {
+            // If the path is invalid, return all possible targets
+            return AlternatePathType.allCases
+        }
+        
+        var candidateTargets: [AlternatePathType] = []
+        
+        // Basic validation checks
+        let isInLibDir = pathComponents.contains("lib")
+        let isInTestDir = pathComponents.contains("test")
+        
+        // Add targets based on path patterns
+        if isInLibDir {
+            candidateTargets.append(.test)
+        }
+        
+        if isInTestDir {
+            candidateTargets.append(.test) // From test to lib
+        }
+        
+        // For simplicity, we'll add common targets that are likely valid for most files
+        candidateTargets.append(contentsOf: [.controller, .model, .view])
+        
+        // If we're in a web context, add web-related targets
+        if pathComponents.contains("controllers") || pathComponents.contains("views") {
+            candidateTargets.append(contentsOf: [.html, .live, .component, .liveComponent, .channel])
+        }
+        
+        // Add other targets that might be relevant
+        candidateTargets.append(contentsOf: [.json, .task, .feature])
+        
+        // If we couldn't determine any valid targets, return all of them
+        if candidateTargets.isEmpty {
+            return AlternatePathType.allCases
+        }
+        
+        // If we don't need to check file existence, return all candidate targets
+        if !checkFileExists {
+            return candidateTargets
+        }
+        
+        // Filter targets to only include those for which the destination file exists
+        var existingTargets: [AlternatePathType] = []
+        for target in candidateTargets {
+            do {
+                let result = try convertPath(inputPath: inputPath, altType: target)
+                if FileManager.default.fileExists(atPath: result.path) {
+                    existingTargets.append(target)
+                }
+            } catch {
+                // If conversion fails, skip this target
+                continue
+            }
+        }
+        
+        // If no existing targets found, return all candidates
+        return existingTargets.isEmpty ? candidateTargets : existingTargets
+    }
     
     public func convertPath(inputPath: String, altType: AlternatePathType) throws -> ConversionResult {
         // Handle paths starting with "./"
