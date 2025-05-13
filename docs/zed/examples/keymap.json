@@ -1,0 +1,17 @@
+{
+  "context": "Editor",
+  "bindings": {
+    "alt-a": [
+      "task::Spawn",
+      { "task_name": "Fawkes: Choose alternate target" }
+    ],
+    "alt-t": ["task::Spawn", { "task_name": "Fawkes: Go to test" }],
+    "alt-shift-a": [
+      "task::Spawn",
+      { "task_name": "Fawkes: Choose alternate target and create if missing" }
+    ],
+    "alt-c": ["task::Spawn", { "task_name": "Fawkes: Go to controller" }],
+    "alt-m": ["task::Spawn", { "task_name": "Fawkes: Go to model" }],
+    "alt-v": ["task::Spawn", { "task_name": "Fawkes: Go to view" }]
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "label": "Fawkes: Choose alternate target",
+    "command": "fawkes alternate --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-choose"]
+  },
+  {
+    "label": "Fawkes: Go to test",
+    "command": "fawkes alternate --target test --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-alternate"]
+  },
+  {
+    "label": "Fawkes: Choose alternate target and create if missing",
+    "command": "fawkes alternate --create --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-create"]
+  },
+  {
+    "label": "Fawkes: Go to controller",
+    "command": "fawkes alternate --target controller --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-controller"]
+  },
+  {
+    "label": "Fawkes: Go to model",
+    "command": "fawkes alternate --target model --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-model"]
+  },
+  {
+    "label": "Fawkes: Go to view",
+    "command": "fawkes alternate --target view --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-view"]
+  }
+]
