@@ -38,9 +38,7 @@ public class FileOpener {
     
     /// Determine the editor settings to use, with the following precedence:
     /// 1. Provided editorSettings
-    /// 2. EDITOR environment variable
-    /// 3. VISUAL environment variable
-    /// 4. Default (code -g)
+    /// 2. Default (zed)
     /// - Parameter editorSettings: Optional editor settings to use
     /// - Returns: The editor settings to use
     public static func determineEditorSettings(_ editorSettings: Configuration.EditorSettings?) -> Configuration.EditorSettings {
@@ -48,14 +46,7 @@ public class FileOpener {
             return settings
         }
         
-        // Check environment variables
-        if let editorCommand = ProcessInfo.processInfo.environment["EDITOR"] {
-            return Configuration.EditorSettings(command: editorCommand, arguments: [])
-        } else if let visualEditor = ProcessInfo.processInfo.environment["VISUAL"] {
-            return Configuration.EditorSettings(command: visualEditor, arguments: [])
-        }
-        
-        // Fall back to default
-        return Configuration.EditorSettings()
+        // Use zed as default
+        return Configuration.EditorSettings(command: "zed", arguments: [])
     }
 }

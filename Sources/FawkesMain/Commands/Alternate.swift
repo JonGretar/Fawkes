@@ -139,17 +139,17 @@ struct Alternate: ParsableCommand {
             
             // Handle file opening if requested
             if open {
-                // Create editor settings from command line or default
-                var editorSettings: Configuration.EditorSettings?
+                // Create editor settings from command line or default to zed
+                var editorSettings: Configuration.EditorSettings
                 if let editorCommand = editor {
                     editorSettings = Configuration.EditorSettings(command: editorCommand, arguments: [])
                 } else {
-                    // Use default settings from config or environment
-                    editorSettings = Configuration.fromDefaultLocations().editor
+                    // Use default settings (zed)
+                    editorSettings = Configuration.EditorSettings()
                 }
                 
                 // Open the file
-                let (success, errorMessage) = FileOpener.openFile(at: result.path, using: FileOpener.determineEditorSettings(editorSettings))
+                let (success, errorMessage) = FileOpener.openFile(at: result.path, using: editorSettings)
                 if !success, let error = errorMessage {
                     print("Failed to open file: \(error)")
                 } else if success && verbose {
