@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -7,7 +7,7 @@ let package = Package(
     name: "Fawkes",
     products: [
         .executable(name: "fawkes", targets: ["FawkesMain"]),
-        .library(name: "FawkesLib", targets: ["FawkesLib"])
+        .library(name: "FawkesLib", targets: ["FawkesLib"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0")
@@ -28,6 +28,6 @@ let package = Package(
         .testTarget(
             name: "FawkesTests",
             dependencies: ["FawkesLib"]
-        )
+        ),
     ]
 )
