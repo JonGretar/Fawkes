@@ -134,19 +134,22 @@ Create a `.zed/tasks.json` file in your project root with the following tasks:
   {
     "label": "Fawkes: Go to test",
     "command": "fawkes alternate --target test --open --editor zed $ZED_FILE",
-    "reveal": "always",
+    "reveal": "never",
+    "hide": "always",
     "tags": ["fawkes-alternate"]
   },
   {
     "label": "Fawkes: Choose alternate target",
     "command": "fawkes alternate --open --editor zed $ZED_FILE",
     "reveal": "always",
+    "hide": "always",
     "tags": ["fawkes-choose"]
   },
   {
     "label": "Fawkes: Choose alternate target and create if missing",
     "command": "fawkes alternate --create --open --editor zed $ZED_FILE",
     "reveal": "always",
+    "hide": "always",
     "tags": ["fawkes-create"]
   }
 ]
@@ -158,7 +161,7 @@ Add the following to your `keymap.json` file (accessible via `zed: open keymap` 
 
 ```json
 {
-  "context": "Editor",
+  "context": "Editor && (extension==ex || extension==exs)",
   "bindings": {
     "alt-t": ["task::Spawn", { "task_name": "Fawkes: Go to test" }],
     "alt-a": [
@@ -196,16 +199,19 @@ Here are some additional task examples for common Fawkes operations:
   {
     "label": "Fawkes: Go to controller",
     "command": "fawkes alternate --target controller --open --editor zed $ZED_FILE",
+    "hide": "always",
     "reveal": "always"
   },
   {
     "label": "Fawkes: Go to model",
     "command": "fawkes alternate --target model --open --editor zed $ZED_FILE",
+    "hide": "always",
     "reveal": "always"
   },
   {
     "label": "Fawkes: Go to view",
     "command": "fawkes alternate --target view --open --editor zed $ZED_FILE",
+    "hide": "always",
     "reveal": "always"
   }
 ]

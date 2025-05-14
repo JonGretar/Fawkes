@@ -1,5 +1,5 @@
 {
-  "context": "Editor",
+  "context": "Editor && (extension==ex || extension==exs)",
   "bindings": {
     "alt-a": [
       "task::Spawn",
