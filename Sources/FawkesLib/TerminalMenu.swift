@@ -168,7 +168,11 @@ public struct TerminalMenu {
         var raw = termios()
         tcgetattr(STDIN_FILENO, &raw)
         
+        #if canImport(Darwin)
         raw.c_lflag &= ~(UInt(ECHO | ICANON))
+        #elseif canImport(Glibc)
+        raw.c_lflag &= ~(UInt32(ECHO | ICANON))
+        #endif
         
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw)
     }
