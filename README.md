@@ -1,6 +1,6 @@
 # Fawkes
 
-Fawkes is a command-line tool designed to enhance Elixir development workflows. It provides a set of utilities to help you navigate, manipulate, and generate code more efficiently.
+Fawkes is a command-line tool designed to enhance Elixir development workflows with Zed editor integration. It provides a set of utilities to help you navigate, manipulate, and generate code more efficiently.
 
 ## Features
 
@@ -88,47 +88,6 @@ Available target types:
 - `task`: Navigate to Mix task files
 - `feature`: Navigate to feature test files
 
-## Configuration
-
-Fawkes can be configured through a JSON configuration file. The tool looks for configuration in the following locations (in order of precedence):
-
-1. `./.fawkes.json` (current directory)
-2. `~/.fawkes.json` (home directory)
-3. `~/.config/fawkes/config.json` (XDG config directory)
-
-Example configuration file:
-
-```json
-{
-  "fileExtensions": {
-    "source": "ex",
-    "test": "exs"
-  },
-  "pathFormats": {
-    "lib": "lib",
-    "test": "test",
-    "web": "_web",
-    "controllers": "controllers",
-    "views": "views",
-    "live": "live",
-    "templates": "templates",
-    "components": "components",
-    "channels": "channels",
-    "tasks": "tasks",
-    "features": "features"
-  },
-  "templates": {
-    "moduleSuffix": true,
-    "includeUse": true,
-    "includeModuleDoc": false
-  },
-  "editor": {
-    "command": "code",
-    "arguments": ["-g"]
-  }
-}
-```
-
 ## File Templates
 
 When using the `--create` flag, Fawkes will automatically generate appropriate file templates based on the file type (unless `--skip-template` is specified):
@@ -160,32 +119,141 @@ end
 
 Templates are customizable through the configuration file.
 
-## Editor Integration
+## Zed Editor Integration
 
-When using the `--open` flag, Fawkes will open the resulting file in an editor. The editor is determined in the following order:
+Fawkes is designed to work seamlessly with the Zed editor. When using the `--open` flag, Fawkes will open the resulting file directly in Zed by default.
 
-1. Command-line option: `--editor vim`
-2. Configuration file setting (`editor.command` and `editor.arguments`)
-3. Environment variables: `$EDITOR` or `$VISUAL`
-4. Default: Zed (`zed`)
+### Task Configuration
 
-Example with different editors:
+Create a `.zed/tasks.json` file in your project root with the following tasks:
 
-```bash
-# Open with default editor (from config or environment)
-fawkes alternate lib/my_app/user.ex --target test --open
-
-# Open with specific editor
-fawkes alternate lib/my_app/user.ex --target test --open --editor vim
-
-# Convert, create if needed (with template), and open in editor
-fawkes alternate lib/my_app/user.ex --target test --create --open
-
-# Convert, create empty file without template, and open in editor
-fawkes alternate lib/my_app/user.ex --target test --create --skip-template --open
+```json
+[
+  {
+    "label": "Fawkes: Go to test",
+    "command": "fawkes alternate --target test --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-alternate"]
+  },
+  {
+    "label": "Fawkes: Choose alternate target",
+    "command": "fawkes alternate --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-choose"]
+  },
+  {
+    "label": "Fawkes: Choose alternate target and create if missing",
+    "command": "fawkes alternate --create --open --editor zed $ZED_FILE",
+    "reveal": "always",
+    "tags": ["fawkes-create"]
+  }
+]
 ```
 
-This is particularly useful in editor-agnostic environments or when using terminal-based workflows.
+### Keybindings
+
+Add the following to your `keymap.json` file (accessible via `zed: open keymap` command):
+
+```json
+{
+  "context": "Editor",
+  "bindings": {
+    "alt-t": ["task::Spawn", { "task_name": "Fawkes: Go to test" }],
+    "alt-a": [
+      "task::Spawn",
+      {
+        "task_name": "Fawkes: Choose alternate target",
+        "reveal_target": "center"
+      }
+    ],
+    "alt-shift-a": [
+      "task::Spawn",
+      {
+        "task_name": "Fawkes: Choose alternate target and create if missing",
+        "reveal_target": "center"
+      }
+    ]
+  }
+}
+```
+
+### Usage
+
+With these configurations, you can use the following keyboard shortcuts:
+
+- `Alt+T`: Directly navigate to the test file for the current file
+- `Alt+A`: Choose an alternate target for the current file (only showing existing files)
+- `Alt+Shift+A`: Choose an alternate target for the current file (with option to create new files)
+
+### Additional Tasks
+
+Here are some additional task examples for common Fawkes operations:
+
+```json
+[
+  {
+    "label": "Fawkes: Go to controller",
+    "command": "fawkes alternate --target controller --open --editor zed $ZED_FILE",
+    "reveal": "always"
+  },
+  {
+    "label": "Fawkes: Go to model",
+    "command": "fawkes alternate --target model --open --editor zed $ZED_FILE",
+    "reveal": "always"
+  },
+  {
+    "label": "Fawkes: Go to view",
+    "command": "fawkes alternate --target view --open --editor zed $ZED_FILE",
+    "reveal": "always"
+  }
+]
+```
+
+### Other Editors
+
+While Zed is the default, you can specify a different editor using the `--editor` flag:
+
+```bash
+# Open with specific editor
+fawkes alternate lib/my_app/user.ex --target test --open --editor vim
+```
+
+## Interactive Target Selection
+
+When running `fawkes alternate` without specifying a target, an interactive menu will be displayed allowing you to:
+
+1. Navigate through targets using arrow keys or j/k
+2. Select a target with Enter/Space
+3. Use number keys (1-9) as shortcuts
+4. Cancel with Escape
+
+The menu will also indicate which files will need to be created:
+
+```
+Available targets for lib/my_app/user.ex:
+ → test
+   controller (create new)
+   model
+   view (create new)
+   html (create new)
+   live (create new)
+```
+
+Navigate: ↑/↓ or j/k | Select: Enter/Space | Cancel: Esc | Shortcut: 1-9
+```
+
+## Example Files
+
+This repository includes ready-to-use example files in the `docs/zed/examples` directory:
+
+- `tasks.json`: A comprehensive set of Fawkes tasks for Zed (all configured to open files directly in Zed)
+- `keymap.json`: Corresponding keybindings for these tasks
+
+To use these files:
+
+1. Create a `.zed` directory in your project root
+2. Copy `docs/zed/examples/tasks.json` to `.zed/tasks.json`
+3. Add the keybindings from `docs/zed/examples/keymap.json` to your global keymap or create a project-specific keymap
 
 ## License
 
