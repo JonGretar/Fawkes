@@ -2,6 +2,8 @@
 
 Fawkes is a command-line tool designed to enhance Elixir development workflows with Zed editor integration. It provides a set of utilities to help you navigate, manipulate, and generate code more efficiently.
 
+**This is just a proof of concept at this stage.** The alternative paths may not make sense at this point. I have not gone over this in a real project or tested this to any real extent. I know that a lot of things in it just do not make sense.
+
 ## Features
 
 ### Alternate Command
@@ -240,6 +242,7 @@ Available targets for lib/my_app/user.ex:
 ```
 
 Navigate: ↑/↓ or j/k | Select: Enter/Space | Cancel: Esc | Shortcut: 1-9
+
 ```
 
 ## Example Files
@@ -252,8 +255,8 @@ This repository includes ready-to-use example files in the `docs/zed/examples` d
 To use these files:
 
 1. Create a `.zed` directory in your project root
-2. Copy `docs/zed/examples/tasks.json` to `.zed/tasks.json`
-3. Add the keybindings from `docs/zed/examples/keymap.json` to your global keymap or create a project-specific keymap
+2. Copy `examples/tasks.json` to `.zed/tasks.json`
+3. Add the keybindings from `examples/keymap.json` to your global keymap or create a project-specific keymap
 
 ## License
 
@@ -262,3 +265,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Author
 
 Created by Jón Grétar Borgþórsson.
+```
