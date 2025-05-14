@@ -10,7 +10,7 @@ The `alternate` command (or its alias `alt`) helps you navigate between related 
 
 - Implementation and test files
 - Models and controllers
-- Controllers and views 
+- Controllers and views
 - Controllers and HTML templates
 - Controllers and JSON renderers
 - Controllers and LiveView modules
@@ -33,12 +33,14 @@ lib/my_app_web/views/user_view.ex
 ### From Source
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/JonGretar/fawkes.git
    cd fawkes
    ```
 
 2. Build the project:
+
    ```bash
    swift build -c release
    ```
@@ -132,6 +134,7 @@ Example configuration file:
 When using the `--create` flag, Fawkes will automatically generate appropriate file templates based on the file type (unless `--skip-template` is specified):
 
 ### Controller Template
+
 ```elixir
 defmodule MyAppWeb.UserController do
   use MyAppWeb, :controller
@@ -139,6 +142,7 @@ end
 ```
 
 ### Model Template
+
 ```elixir
 defmodule MyApp.User do
   use Ecto.Schema
@@ -147,6 +151,7 @@ end
 ```
 
 ### LiveView Template
+
 ```elixir
 defmodule MyAppWeb.UserLive do
   use MyAppWeb, :live_view
@@ -162,9 +167,10 @@ When using the `--open` flag, Fawkes will open the resulting file in an editor. 
 1. Command-line option: `--editor vim`
 2. Configuration file setting (`editor.command` and `editor.arguments`)
 3. Environment variables: `$EDITOR` or `$VISUAL`
-4. Default: Visual Studio Code (`code -g`)
+4. Default: Zed (`zed`)
 
 Example with different editors:
+
 ```bash
 # Open with default editor (from config or environment)
 fawkes alternate lib/my_app/user.ex --target test --open

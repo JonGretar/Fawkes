@@ -252,12 +252,24 @@ public struct AlternatePathConverter: Sendable {
                     // Convert to web module by replacing the app name with web version
                     let webModuleName = "\(appName)_web"
                     
-                    // Replace the regular app module with web module
-                    result[libIndex + 1] = webModuleName
-                    
-                    // Add controllers if needed
-                    if !result.contains("controllers") {
-                        result.insert("controllers", at: libIndex + 2)
+                    // Check if we have enough path segments and there might be a submodule structure
+                    if libIndex + 2 < result.count {
+                        // Keep the original app name in place
+                        // Insert the web module name after it
+                        result.insert(webModuleName, at: libIndex + 2)
+                        
+                        // Add controllers if needed
+                        if !result.contains("controllers") {
+                            result.insert("controllers", at: libIndex + 3)
+                        }
+                    } else {
+                        // Simple case, just replace the app module with web module
+                        result[libIndex + 1] = webModuleName
+                        
+                        // Add controllers if needed
+                        if !result.contains("controllers") {
+                            result.insert("controllers", at: libIndex + 2)
+                        }
                     }
                 } else {
                     // Already in web module, just add controllers if not there
